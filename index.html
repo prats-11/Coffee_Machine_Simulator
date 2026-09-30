@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BaristaCraft Pro™ - Coffee Vending Machine Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Ambient Lighting Elements -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+  
+  <header class="top-nav">
+    <div class="brand">
+      <div class="brand-logo">☕</div>
+      <div>
+        <h1>BaristaCraft Pro™ <span class="badge">9000-X</span></h1>
+        <p class="subtitle">Next-Gen Intelligent Coffee Vending Machine Simulator</p>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <button id="soundToggleBtn" class="pill-btn" title="Toggle Sound Effects">
+        <span class="icon">🔊</span> Sound: ON
+      </button>
+      <button id="adminToggleBtn" class="pill-btn highlight" title="Open Maintenance Panel">
+        <span class="icon">⚙️</span> Telemetry & Stock
+      </button>
+    </div>
+  </header>
+
+  <main class="kiosk-container">
+    <!-- Main Kiosk Body -->
+    <div class="kiosk-chassis">
+      
+      <!-- Top Status Marquee -->
+      <div class="kiosk-header">
+        <div class="kiosk-id">TERMINAL #BC-402</div>
+        <div class="kiosk-status-ticker">
+          <span class="status-dot online"></span>
+          <span id="tickerText">SYSTEM READY • FRESH BEANS LOADED • OPTIMAL PRESSURE 9.2 BAR</span>
+        </div>
+        <div class="kiosk-clock" id="kioskClock">12:00:00 PM</div>
+      </div>
+
+      <div class="kiosk-grid">
+        
+        <!-- LEFT: Interactive Touchscreen Display -->
+        <section class="screen-panel">
+          <div class="touchscreen-frame">
+            <div class="touchscreen-screen">
+              
+              <!-- Screen Header -->
+              <div class="screen-top-bar">
+                <div class="screen-step-indicators">
+                  <div class="step-pill active" id="stepIndicator1"><span class="step-num">1</span> Select Drink</div>
+                  <div class="step-arrow">›</div>
+                  <div class="step-pill" id="stepIndicator2"><span class="step-num">2</span> Payment</div>
+                  <div class="step-arrow">›</div>
+                  <div class="step-pill" id="stepIndicator3"><span class="step-num">3</span> Brewing</div>
+                  <div class="step-arrow">›</div>
+                  <div class="step-pill" id="stepIndicator4"><span class="step-num">4</span> Ready</div>
+                </div>
+              </div>
+
+              <!-- VIEW 1: Coffee Menu Grid -->
+              <div class="screen-view view-menu active" id="viewMenu">
+                <div class="view-header">
+                  <div>
+                    <h2>Choose Your Artisan Coffee</h2>
+                    <p>Select any premium beverage below to start your order</p>
+                  </div>
+                  <div class="promo-tag">✨ 100% Arabica Roast</div>
+                </div>
+
+                <div class="coffee-menu-grid" id="coffeeMenuGrid">
+                  <!-- Coffee Cards injected via JS -->
+                </div>
+
+                <!-- Customization Panel (Optional sweetness / temperature) -->
+                <div class="customization-bar">
+                  <div class="cust-group">
+                    <span class="cust-label">Sugar Level:</span>
+                    <div class="sugar-selector" id="sugarSelector">
+                      <button class="sugar-btn active" data-sugar="0">None</button>
+                      <button class="sugar-btn" data-sugar="1">1 Cube</button>
+                      <button class="sugar-btn" data-sugar="2">2 Cubes</button>
+                      <button class="sugar-btn" data-sugar="3">Extra (3)</button>
+                    </div>
+                  </div>
+                  <div class="cust-group">
+                    <span class="cust-label">Temperature:</span>
+                    <div class="temp-selector" id="tempSelector">
+                      <button class="temp-btn active" data-temp="Hot (90°C)">🔥 Hot (90°C)</button>
+                      <button class="temp-btn" data-temp="Extra Hot (95°C)">⚡ Extra Hot</button>
+                      <button class="temp-btn" data-temp="Iced Cold">❄️ Iced</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- VIEW 2: Payment & Balance Screen -->
+              <div class="screen-view view-payment" id="viewPayment">
+                <div class="payment-view-card">
+                  <div class="selected-drink-preview">
+                    <div class="drink-avatar" id="payDrinkIcon">☕</div>
+                    <div class="drink-details">
+                      <h2 id="payDrinkName">Cappuccino</h2>
+                      <p id="payDrinkDesc">Rich espresso with frothy steamed milk</p>
+                      <div class="custom-specs" id="payDrinkSpecs">Sugar: 1 Cube • Hot 90°C</div>
+                    </div>
+                    <div class="drink-price-tag">
+                      <span class="currency">$</span><span id="payDrinkPrice">4.50</span>
+                    </div>
+                  </div>
+
+                  <div class="payment-status-board">
+                    <div class="amount-row">
+                      <span class="amount-label">Total Price:</span>
+                      <span class="amount-val" id="dispTotalAmount">$4.50</span>
+                    </div>
+                    <div class="amount-row">
+                      <span class="amount-label">Total Inserted / Paid:</span>
+                      <span class="amount-val highlight" id="dispPaidAmount">$0.00</span>
+                    </div>
+                    <div class="amount-row remaining" id="remainingRow">
+                      <span class="amount-label" id="dispStatusLabel">Remaining Balance Required:</span>
+                      <span class="amount-val alert" id="dispRemainingAmount">$4.50</span>
+                    </div>
+                  </div>
+
+                  <!-- Quick Payment Insertion on Screen -->
+                  <div class="payment-methods-box">
+                    <div class="pm-title">👉 Insert money using physical payment slot on right or quick-insert below:</div>
+                    <div class="quick-cash-row">
+                      <button class="cash-chip" onclick="insertMoney(1)">+$1.00</button>
+                      <button class="cash-chip" onclick="insertMoney(2)">+$2.00</button>
+                      <button class="cash-chip" onclick="insertMoney(5)">+$5.00</button>
+                      <button class="cash-chip" onclick="insertMoney(10)">+$10.00</button>
+                      <button class="cash-chip" onclick="insertExact()">Exact ($<span id="exactBtnVal">4.50</span>)</button>
+                    </div>
+                  </div>
+
+                  <!-- Action Buttons -->
+                  <div class="payment-action-buttons">
+                    <button class="btn btn-danger" id="cancelOrderBtn">
+                      <span class="btn-icon">🚫</span> Cancel & Full Refund
+                    </button>
+                    <button class="btn btn-success" id="confirmBrewBtn" disabled>
+                      <span class="btn-icon">⚡</span> Start Brewing
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- VIEW 3: Brewing Simulation Screen -->
+              <div class="screen-view view-brewing" id="viewBrewing">
+                <div class="brewing-display">
+                  <div class="brewing-header">
+                    <h2 id="brewingTitle">Crafting Your Artisan Beverage</h2>
+                    <p id="brewingStepText">Step 1: Grinding roasted coffee beans...</p>
+                  </div>
+
+                  <div class="brew-progress-bar-container">
+                    <div class="brew-progress-fill" id="brewProgressFill"></div>
+                  </div>
+                  <div class="brew-pct" id="brewProgressPct">0%</div>
+
+                  <div class="brewing-visual-stages">
+                    <div class="stage-item" id="stageGrind">
+                      <div class="stage-icon">⚙️</div>
+                      <div class="stage-name">Grind</div>
+                    </div>
+                    <div class="stage-item" id="stageHeat">
+                      <div class="stage-icon">🔥</div>
+                      <div class="stage-name">Heat Water</div>
+                    </div>
+                    <div class="stage-item" id="stageExtract">
+                      <div class="stage-icon">☕</div>
+                      <div class="stage-name">Extract</div>
+                    </div>
+                    <div class="stage-item" id="stageFroth">
+                      <div class="stage-icon">🥛</div>
+                      <div class="stage-name">Froth Milk</div>
+                    </div>
+                    <div class="stage-item" id="stagePour">
+                      <div class="stage-icon">✨</div>
+                      <div class="stage-name">Finish</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- VIEW 4: Order Ready & Receipt Screen -->
+              <div class="screen-view view-ready" id="viewReady">
+                <div class="ready-card">
+                  <div class="celebration-badge">🎉 Ready To Enjoy! 🎉</div>
+                  <h2 id="readyDrinkTitle">Your Caffè Latte is Ready!</h2>
+                  <p>Carefully brewed at 92°C with freshly ground beans</p>
+
+                  <div class="receipt-box" id="receiptBox">
+                    <div class="receipt-header">
+                      <div class="receipt-shop">BARISTACRAFT COFFEE VENDING</div>
+                      <div class="receipt-date" id="receiptTimestamp">2026-09-30 16:30</div>
+                    </div>
+                    <div class="receipt-divider">--------------------------------</div>
+                    <div class="receipt-row">
+                      <span id="receiptItemName">1x Cappuccino</span>
+                      <span id="receiptItemPrice">$4.50</span>
+                    </div>
+                    <div class="receipt-row muted" id="receiptCustoms">
+                      <span>Sugar: 1 Cube | Hot 90°C</span>
+                    </div>
+                    <div class="receipt-divider">--------------------------------</div>
+                    <div class="receipt-row">
+                      <span>Amount Paid:</span>
+                      <span id="receiptPaid">$10.00</span>
+                    </div>
+                    <div class="receipt-row highlight-change">
+                      <span>Change Dispensed:</span>
+                      <span id="receiptChange">$5.50</span>
+                    </div>
+                    <div class="receipt-divider">--------------------------------</div>
+                    <div class="receipt-footer">THANK YOU FOR YOUR ORDER! ❤️</div>
+                  </div>
+
+                  <div class="ready-actions">
+                    <button class="btn btn-primary" id="collectCupBtn">
+                      <span class="btn-icon">☕</span> Collect Drink & New Order
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- RIGHT: Physical Machine Chamber, Payment Terminal & Ingredients -->
+        <section class="hardware-panel">
+          
+          <!-- Dispenser Chamber / Cup Visualizer -->
+          <div class="chamber-box">
+            <div class="chamber-header">
+              <span class="chamber-label">DISPENSING CHAMBER</span>
+              <span class="chamber-led" id="dispenserLed"></span>
+            </div>
+            
+            <div class="chamber-interior">
+              <!-- Animated Steam Particles -->
+              <div class="steam-container" id="steamContainer">
+                <span class="steam s1"></span>
+                <span class="steam s2"></span>
+                <span class="steam s3"></span>
+              </div>
+
+              <!-- Coffee Stream Dripping -->
+              <div class="nozzle-container">
+                <div class="metal-nozzle"></div>
+                <div class="coffee-stream" id="coffeeStream"></div>
+              </div>
+
+              <!-- Dynamic Interactive Glass Coffee Cup -->
+              <div class="cup-stage" id="cupStage">
+                <div class="cup" id="coffeeCup">
+                  <div class="cup-handle"></div>
+                  <div class="cup-liquid" id="cupLiquid">
+                    <div class="foam-layer" id="foamLayer"></div>
+                    <div class="liquid-body" id="liquidBody"></div>
+                  </div>
+                  <div class="cup-shine"></div>
+                </div>
+                <div class="cup-pedestal"></div>
+              </div>
+            </div>
+
+            <div class="chamber-door-handle">
+              <span>AUTOMATIC SENSOR DOOR</span>
+            </div>
+          </div>
+
+          <!-- Physical Payment Slot Terminal -->
+          <div class="hardware-payment-terminal">
+            <div class="terminal-title">PHYSICAL PAYMENT SLOTS</div>
+            
+            <!-- Cash / Coin Drop Interactive Buttons -->
+            <div class="hardware-slots-grid">
+              <div class="slot-card" onclick="insertMoney(1)" title="Insert $1 Dollar Bill">
+                <div class="slot-icon">💵</div>
+                <div class="slot-name">Insert $1</div>
+                <div class="slot-slit"></div>
+              </div>
+              <div class="slot-card" onclick="insertMoney(5)" title="Insert $5 Dollar Bill">
+                <div class="slot-icon">💵</div>
+                <div class="slot-name">Insert $5</div>
+                <div class="slot-slit"></div>
+              </div>
+              <div class="slot-card" onclick="insertMoney(10)" title="Insert $10 Dollar Bill">
+                <div class="slot-icon">💵</div>
+                <div class="slot-name">Insert $10</div>
+                <div class="slot-slit"></div>
+              </div>
+              <div class="slot-card" onclick="insertMoney(20)" title="Insert $20 Dollar Bill">
+                <div class="slot-icon">💵</div>
+                <div class="slot-name">Insert $20</div>
+                <div class="slot-slit"></div>
+              </div>
+            </div>
+
+            <!-- Custom Currency Keypad -->
+            <div class="custom-insert-row">
+              <span class="input-symbol">$</span>
+              <input type="number" id="customCashInput" placeholder="Custom amount" step="0.25" min="0.25">
+              <button class="btn-insert" id="insertCustomCashBtn">Insert</button>
+            </div>
+
+            <!-- Tap NFC / Card Simulator -->
+            <div class="card-tap-pad" id="nfcTapPad" title="Tap Contactless Card for Exact Amount">
+              <div class="nfc-icon">📡</div>
+              <div class="nfc-text">
+                <strong>Tap Contactless Card</strong>
+                <small>Instant exact auto-payment</small>
+              </div>
+            </div>
+
+            <!-- Physical Change Dispenser Chute -->
+            <div class="change-dispenser-chute">
+              <div class="chute-label">🪙 CHANGE / REFUND RETURN TRAY</div>
+              <div class="chute-tray" id="chuteTray">
+                <span class="chute-empty" id="chuteStatusText">Tray Empty</span>
+                <div class="dispensed-coins" id="dispensedCoins"></div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+
+      <!-- BOTTOM: Live Ingredient Telemetry Tanks -->
+      <footer class="kiosk-footer-tanks">
+        <div class="tanks-header">
+          <div class="tanks-title">
+            <span class="icon">🧪</span>
+            <strong>LIVE INGREDIENT INVENTORY & AUTO-REFILL SENSORS</strong>
+          </div>
+          <div class="auto-refill-badge">
+            <span class="pulse-dot"></span> SMART AUTO-REFILL: <strong class="green-text">ACTIVE</strong>
+          </div>
+        </div>
+
+        <div class="tanks-grid" id="tanksGrid">
+          <!-- Water Tank -->
+          <div class="tank-card" id="tankWater">
+            <div class="tank-info">
+              <span class="tank-name">💧 Purified Water</span>
+              <span class="tank-val" id="valWater">1200 / 2000 ml</span>
+            </div>
+            <div class="tank-tube">
+              <div class="tank-level water-level" id="levelWater" style="height: 60%;"></div>
+            </div>
+            <div class="tank-meta">
+              <span class="tank-pct" id="pctWater">60%</span>
+              <span class="refill-trigger" id="tagWater">Auto-refills &lt; 150ml</span>
+            </div>
+          </div>
+
+          <!-- Milk Tank -->
+          <div class="tank-card" id="tankMilk">
+            <div class="tank-info">
+              <span class="tank-name">🥛 Fresh Whole Milk</span>
+              <span class="tank-val" id="valMilk">900 / 1500 ml</span>
+            </div>
+            <div class="tank-tube">
+              <div class="tank-level milk-level" id="levelMilk" style="height: 60%;"></div>
+            </div>
+            <div class="tank-meta">
+              <span class="tank-pct" id="pctMilk">60%</span>
+              <span class="refill-trigger" id="tagMilk">Auto-refills &lt; 120ml</span>
+            </div>
+          </div>
+
+          <!-- Coffee Powder Tank -->
+          <div class="tank-card" id="tankCoffee">
+            <div class="tank-info">
+              <span class="tank-name">☕ Ground Arabica Beans</span>
+              <span class="tank-val" id="valCoffee">300 / 500 g</span>
+            </div>
+            <div class="tank-tube">
+              <div class="tank-level coffee-level" id="levelCoffee" style="height: 60%;"></div>
+            </div>
+            <div class="tank-meta">
+              <span class="tank-pct" id="pctCoffee">60%</span>
+              <span class="refill-trigger" id="tagCoffee">Auto-refills &lt; 25g</span>
+            </div>
+          </div>
+
+          <!-- Sugar Tank -->
+          <div class="tank-card" id="tankSugar">
+            <div class="tank-info">
+              <span class="tank-name">🍬 Cane Sugar</span>
+              <span class="tank-val" id="valSugar">250 / 400 g</span>
+            </div>
+            <div class="tank-tube">
+              <div class="tank-level sugar-level" id="levelSugar" style="height: 62.5%;"></div>
+            </div>
+            <div class="tank-meta">
+              <span class="tank-pct" id="pctSugar">62.5%</span>
+              <span class="refill-trigger" id="tagSugar">Auto-refills &lt; 20g</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  </main>
+
+  <!-- Auto-Refill Notification Toast / Modal -->
+  <div class="refill-toast" id="refillToast">
+    <div class="refill-toast-icon">⚡</div>
+    <div class="refill-toast-content">
+      <h4>Smart Refill System Triggered</h4>
+      <p id="refillToastMsg">Water level below minimum threshold. Automatically restored to 2000ml.</p>
+    </div>
+  </div>
+
+  <!-- Refund Alert Toast -->
+  <div class="refund-toast" id="refundToast">
+    <div class="refund-toast-icon">💸</div>
+    <div class="refund-toast-content">
+      <h4>Transaction Cancelled</h4>
+      <p id="refundToastMsg">Full refund of $0.00 returned to change tray.</p>
+    </div>
+  </div>
+
+  <!-- Telemetry / Maintenance Modal Drawer -->
+  <div class="modal-overlay" id="adminModalOverlay">
+    <div class="admin-modal">
+      <div class="modal-header">
+        <h2>🛠️ Machine Telemetry & Maintenance Diagnostics</h2>
+        <button class="modal-close" id="closeAdminModalBtn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-num" id="statCups">0</div>
+            <div class="stat-label">Total Cups Brewed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="statRevenue">$0.00</div>
+            <div class="stat-label">Total Revenue</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num green-text">NORMAL</div>
+            <div class="stat-label">Pump Pressure (9.2 Bar)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">92°C</div>
+            <div class="stat-label">Boiler Temperature</div>
+          </div>
+        </div>
+
+        <div class="modal-section-title">Machine Activity & Refill Event Logs</div>
+        <div class="log-console" id="logConsole">
+          <!-- Logs injected via JS -->
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="manualRefillAllBtn">
+            <span class="btn-icon">⚡</span> Manual Refill All Tanks to 100%
+          </button>
+          <button class="btn btn-secondary" id="depleteForTestBtn" title="Artificially lower water to test auto-refill immediately">
+            <span class="btn-icon">🧪</span> Simulate Low Stock (Test Auto-Refill)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
